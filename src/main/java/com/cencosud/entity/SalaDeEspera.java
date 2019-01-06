@@ -1,13 +1,11 @@
 package com.cencosud.entity;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -17,7 +15,8 @@ public class SalaDeEspera {
 	private SalaDeEsperaId idSalaDeEspera;
 //	private Paciente paciente;
 //	private Consulta consulta;
-	private Date llegada;
+	private Timestamp llegada;
+	private boolean pendiente;
 	
 	@EmbeddedId
 	public SalaDeEsperaId getIdSalaDeEspera() {
@@ -46,10 +45,20 @@ public class SalaDeEspera {
 	}*/
 	
 	@Column(name = "llegada")
-	public Date getLlegada() {
+	public Timestamp getLlegada() {
 		return llegada;
 	}
-	public void setLlegada(Date llegada) {
+	public void setLlegada(Timestamp llegada) {
 		this.llegada = llegada;
 	}
+	
+	@Column(name = "pendiente")
+	public boolean isPendiente() {
+		return pendiente;
+	}
+	public void setPendiente(boolean pendiente) {
+		this.pendiente = pendiente;
+	}
+	
+	
 }

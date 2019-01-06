@@ -21,7 +21,7 @@ public class Paciente {
 	private Integer nroHistoriaClinica;
 	private Integer relacionPesoEstatura;
 	private Integer aniosFumando;
-	private boolean dieta;
+	private Boolean dieta;
 	private Hospital hospital;
 	private Integer edad;
 	private BigDecimal prioridad;
@@ -77,10 +77,10 @@ public class Paciente {
 	}
 	
 	@Column(name = "dieta")
-	public boolean isDieta() {
+	public Boolean isDieta() {
 		return dieta;
 	}
-	public void setDieta(boolean dieta) {
+	public void setDieta(Boolean dieta) {
 		this.dieta = dieta;
 	}
 	

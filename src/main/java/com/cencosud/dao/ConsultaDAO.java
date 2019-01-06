@@ -9,5 +9,5 @@ import com.cencosud.entity.Consulta;
 @Repository
 public interface ConsultaDAO extends GenericDAO<Consulta, Long>{
 
-	public Consulta getConsultaPacientesAtendidos();
+	public List<Consulta> getConsultaPacientesAtendidos();
 }

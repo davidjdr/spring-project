@@ -115,7 +115,7 @@ CREATE TABLE `paciente` (
   `relacion_peso_estatura` int(11) DEFAULT NULL,
   `anios_fumando` int(11) DEFAULT NULL,
   `id_hospital` int(11) NOT NULL,
-  `dieta` tinyint(1) DEFAULT NULL,
+  `dieta` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id_paciente`),
   UNIQUE KEY `paciente_UN` (`nro_historia_clinica`),
   KEY `paciente_hospital_FK` (`id_hospital`),
@@ -129,7 +129,7 @@ CREATE TABLE `paciente` (
 
 LOCK TABLES `paciente` WRITE;
 /*!40000 ALTER TABLE `paciente` DISABLE KEYS */;
-INSERT INTO `paciente` VALUES (1,'aboris ni','2001-01-30',1,NULL,0,2,NULL),(2,'llamco ','1998-06-02',2,NULL,0,2,NULL),(3,'qui of','1951-10-17',3,NULL,NULL,1,0),(4,'g el','1999-11-26',4,NULL,0,1,NULL),(5,'at. Duis aute irur','2015-08-14',5,2,NULL,1,NULL),(6,'et, consectetur adip','2003-05-12',6,4,NULL,1,NULL),(7,'ore et dolore ma','1982-08-19',7,NULL,5,2,NULL),(8,'ru','2015-01-31',8,2,NULL,2,NULL),(9,'ed do e','1984-11-07',9,NULL,7,1,NULL),(10,' ex ea commodo co','1952-05-02',10,NULL,NULL,2,1);
+INSERT INTO `paciente` VALUES (1,'aboris ni','2001-01-30',1,NULL,0,2,0),(2,'llamco ','1998-06-02',2,NULL,0,2,0),(3,'qui of','1951-10-17',3,NULL,NULL,1,0),(4,'g el','1999-11-26',4,NULL,0,1,0),(5,'at. Duis aute irur','2015-08-14',5,2,NULL,1,0),(6,'et, consectetur adip','2003-05-12',6,4,NULL,1,0),(7,'ore et dolore ma','1986-10-20',7,NULL,5,2,0),(8,'ru','2015-01-31',8,2,NULL,2,0),(9,'ed do e','1984-11-07',9,NULL,7,1,0),(10,' ex ea commodo co','1952-05-02',10,NULL,NULL,2,1);
 /*!40000 ALTER TABLE `paciente` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,6 +144,7 @@ CREATE TABLE `sala_de_espera` (
   `id_paciente` int(11) NOT NULL,
   `id_consulta` int(11) NOT NULL,
   `llegada` date NOT NULL,
+  `pendiente` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_paciente`,`id_consulta`),
   KEY `sala_de_espera_consulta_FK` (`id_consulta`),
   CONSTRAINT `sala_de_espera_consulta_FK` FOREIGN KEY (`id_consulta`) REFERENCES `consulta` (`id_consulta`),
@@ -314,4 +315,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-01-04  0:41:27
+-- Dump completed on 2019-01-05 21:08:23

@@ -10,5 +10,7 @@ import com.cencosud.entity.Paciente;
 @Repository
 public interface PacienteDAO extends GenericDAO<Paciente, Long>{
 
-	public List<Paciente> getPacientesMayorRiesgo(BigDecimal riesgo);
+	public List<Paciente> getPacientesMayorRiesgo(Integer nroHistoriaClinica);
+
+	public List<Paciente> obtenerPacienteDeMasEdad();
 }

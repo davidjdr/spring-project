@@ -23,16 +23,23 @@ public class FonasaService {
 	ConsultaDAO consultaDAO;
 	
 	@Transactional
-	public List<Paciente> obtenerPacientesMayorRiesgo(BigDecimal riesgo) {
-		List<Paciente> pacientes = pacienteDAO.getPacientesMayorRiesgo(riesgo);
+	public List<Paciente> obtenerPacientesMayorRiesgo(Integer nroHistoriaClinica) {
+		List<Paciente> pacientes = pacienteDAO.getPacientesMayorRiesgo(nroHistoriaClinica);
 		
 		return pacientes;
 	}
 	
 	@Transactional
-	public Consulta obtenerConsultaMasPacAtendidos() {
-		Consulta consulta = consultaDAO.getConsultaPacientesAtendidos();
+	public List<Consulta> obtenerConsultaMasPacAtendidos() {
+		List<Consulta> consultas = consultaDAO.getConsultaPacientesAtendidos();
 		
-		return consulta;
+		return consultas;
+	}
+	
+	@Transactional
+	public List<Paciente> obtenerPacienteDeMasEdad() {
+		List<Paciente> pacientes = pacienteDAO.obtenerPacienteDeMasEdad();
+		
+		return pacientes;
 	}
 }

@@ -19,16 +19,31 @@ public class PacienteDAOImpl extends GenericDAOImpl <Paciente, Long> implements 
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Paciente> getPacientesMayorRiesgo(BigDecimal riesgo) {
+	public List<Paciente> getPacientesMayorRiesgo(Integer nroHistoriaClinica) {
 		List<Paciente> pacientes = null;
 		
 		String hql = "select pac "
 			      +" from  Paciente pac "
-			      +" where pac.riesgo >  :riesgo";
+			      +" where pac.riesgo >  (select pp.riesgo from Paciente pp where pp.nroHistoriaClinica = :nroHistoriaClinica)";
 		
 		Query q  = this.sessionFactory.getCurrentSession().createQuery(hql);
 		
-		q.setParameter("riesgo", riesgo);
+		q.setParameter("nroHistoriaClinica", nroHistoriaClinica);
+		
+		pacientes = q.getResultList();
+		
+		return pacientes;
+	}
+
+	@Override
+	public List<Paciente> obtenerPacienteDeMasEdad() {
+		List<Paciente> pacientes = null;
+		
+		String hql = "select pac from Paciente pac "
+				  +" JOIN SalaDeEspera se ON se.idSalaDeEspera.idPaciente = pac.idPaciente "
+			      +" where pac.edad = (select max(pp.edad) from Paciente pp JOIN SalaDeEspera ss ON ss.idSalaDeEspera.idPaciente = pp.idPaciente where ss.pendiente = 0) ";
+		
+		Query q  = this.sessionFactory.getCurrentSession().createQuery(hql);
 		
 		pacientes = q.getResultList();
 		

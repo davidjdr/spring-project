@@ -18,18 +18,19 @@ public class ConsultaDAOImpl extends GenericDAOImpl <Consulta, Long> implements 
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Consulta getConsultaPacientesAtendidos() {
-		Consulta consulta = null;
+	public List<Consulta> getConsultaPacientesAtendidos() {
+		List<Consulta> consultas = null;
 		
 		String hql = "select c from Consulta c "
-			      +" where c.cantPacientes =  (select max(cc.version) from Consulta cc) ";
+			      +" where c.cantPacientes =  (select max(cc.cantPacientes) from Consulta cc) ";
 		
-		Query q  = this.sessionFactory.getCurrentSession().createQuery(hql);
+		Query<Consulta> q  = this.sessionFactory.getCurrentSession().createQuery(hql);
 		
-		consulta = (Consulta) q.getSingleResult();
+		consultas = q.getResultList();
 		
-		return consulta;
+		return consultas;
 	}
 
 }

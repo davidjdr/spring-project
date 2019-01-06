@@ -1,6 +1,5 @@
 package com.cencosud.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -13,12 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cencosud.dao.ConsultaDAO;
-import com.cencosud.dao.PacienteDAO;
 import com.cencosud.entity.Consulta;
 import com.cencosud.entity.Paciente;
 import com.cencosud.service.FonasaService;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @RestController
 public class MainController {
@@ -26,11 +22,11 @@ public class MainController {
 	@Autowired
 	FonasaService fonasaService;
 	
-	@RequestMapping(value = "/pacientesMayorRiesgo/{riesgo}", method = RequestMethod.GET)
-	public ResponseEntity<List<Paciente>> getPacientesMayorRiesgo(@PathVariable(value = "riesgo") BigDecimal riesgo) {
+	@RequestMapping(value = "/pacientesMayorRiesgo/{nroHistoriaClinica}", method = RequestMethod.GET)
+	public ResponseEntity<List<Paciente>> getPacientesMayorRiesgo(@PathVariable(value = "nroHistoriaClinica") Integer nroHistoriaClinica) {
 		ResponseEntity<List<Paciente>> resp = null;
 		
-		List<Paciente> pacientes = fonasaService.obtenerPacientesMayorRiesgo(riesgo);
+		List<Paciente> pacientes = fonasaService.obtenerPacientesMayorRiesgo(nroHistoriaClinica);
 		
 		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
 
@@ -59,21 +55,25 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = "/consulta/pacientesAtentidos", method = RequestMethod.GET)
-	public ResponseEntity<Consulta> getConsultaPacientesAtendidos() {
-		ResponseEntity<Consulta> resp = null;
+	public ResponseEntity<List<Consulta>> getConsultaPacientesAtendidos() {
+		ResponseEntity<List<Consulta>> resp = null;
 
-		Consulta consulta = fonasaService.obtenerConsultaMasPacAtendidos();
+		List<Consulta> consultas = fonasaService.obtenerConsultaMasPacAtendidos();
 		
-		resp = new ResponseEntity<>(consulta, HttpStatus.OK);
+		resp = new ResponseEntity<>(consultas, HttpStatus.OK);
 		
 		return resp;
 	}
 	
-	@RequestMapping(value = "/paciente/mayor", method = RequestMethod.GET)
+	@RequestMapping(value = "/paciente/enEspera/masEdad", method = RequestMethod.GET)
 	public ResponseEntity<List<Paciente>> getConsultaPacienteMayor() {
-		//TODO: por implementar
+		ResponseEntity<List<Paciente>> resp = null;
 		
-		return null;
+		List<Paciente> pacientes = fonasaService.obtenerPacienteDeMasEdad();
+		
+		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
+		
+		return resp;
 	}
 	
 	@RequestMapping(value = "/consulta/optimizarAtencion", method = RequestMethod.GET)
