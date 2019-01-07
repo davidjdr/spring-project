@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cencosud.entity.Consulta;
-import com.cencosud.entity.Paciente;
+import com.cencosud.entity.PacienteAnciano;
+import com.cencosud.entity.PacienteJoven;
+import com.cencosud.entity.PacienteMain;
+import com.cencosud.exception.FonasaException;
 import com.cencosud.service.FonasaService;
 
 @RestController
@@ -23,35 +26,53 @@ public class MainController {
 	FonasaService fonasaService;
 	
 	@RequestMapping(value = "/pacientesMayorRiesgo/{nroHistoriaClinica}", method = RequestMethod.GET)
-	public ResponseEntity<List<Paciente>> getPacientesMayorRiesgo(@PathVariable(value = "nroHistoriaClinica") Integer nroHistoriaClinica) {
-		ResponseEntity<List<Paciente>> resp = null;
+	public ResponseEntity<List<PacienteMain>> getPacientesMayorRiesgo(@PathVariable(value = "nroHistoriaClinica") Integer nroHistoriaClinica) {
+		ResponseEntity<List<PacienteMain>> resp = null;
 		
-		List<Paciente> pacientes = fonasaService.obtenerPacientesMayorRiesgo(nroHistoriaClinica);
+		List<PacienteMain> pacientes = fonasaService.obtenerPacientesMayorRiesgo(nroHistoriaClinica);
 		
 		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
 
 		return resp;
 	}
 	
-	@RequestMapping(value = "/atenderPaciente", method = RequestMethod.GET)
+	/**
+	 * 
+	 */
+	@RequestMapping(value = "/atenderPacientes", method = RequestMethod.GET)
 	public String atenderPaciente() {
-		//TODO: por implementar
-		
-		return null;
+		try {
+			fonasaService.atenderPacientes();
+			return "atencion de pacientes procesada";
+		} catch (FonasaException e) {
+			return e.getMessage();
+		}
 	}
 	
 	@RequestMapping(value = "/liberarConsultas", method = RequestMethod.GET)
 	public String liberarConsultas() {
-		//TODO: por implementar
 		
-		return null;
+		Boolean respuesta = fonasaService.liberarConsultas();
+		
+		return (respuesta)? "consultas liberadas" : "error al liberar las consultas";
 	}
 	
+	/**
+	 * según la descripción del sistema, los pacientes fumadores son los jóvenes (16-40 años)
+	 * Por ello usé la clase PacienteJoven, para sacar los urgentes, si son fumadores 
+	 * y ordenados por su riesgo
+	 * @return ResponseEntity<List<PacienteJoven>>
+	 */
 	@RequestMapping(value = "/pacientesFumadoresUrgentes", method = RequestMethod.GET)
-	public ResponseEntity<List<Paciente>> getPacientesFumadoresUrgentes() {
-		//TODO: por implementar
+	public ResponseEntity<List<PacienteJoven>> getPacientesFumadoresUrgentes() {
 		
-		return null;
+		List<PacienteJoven> pacientes = fonasaService.obtenerPacientesFumadoresUrgentes();
+		
+		ResponseEntity<List<PacienteJoven>> resp = null;
+		
+		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
+		
+		return resp;
 	}
 	
 	@RequestMapping(value = "/consulta/pacientesAtentidos", method = RequestMethod.GET)
@@ -66,29 +87,38 @@ public class MainController {
 	}
 	
 	@RequestMapping(value = "/paciente/enEspera/masEdad", method = RequestMethod.GET)
-	public ResponseEntity<List<Paciente>> getConsultaPacienteMayor() {
-		ResponseEntity<List<Paciente>> resp = null;
+	public ResponseEntity<List<PacienteMain>> getConsultaPacienteMayor() {
+		ResponseEntity<List<PacienteMain>> resp = null;
 		
-		List<Paciente> pacientes = fonasaService.obtenerPacienteDeMasEdad();
+		List<PacienteMain> pacientes = fonasaService.obtenerPacienteDeMasEdad();
 		
 		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
 		
 		return resp;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	@RequestMapping(value = "/consulta/optimizarAtencion", method = RequestMethod.GET)
-	public ResponseEntity<List<Paciente>> consultaOptimizarAtencion() {
-		//TODO: por implementar
-		
-		return null;
+	public String consultaOptimizarAtencion() {
+		try {
+			fonasaService.optimizarAtencion();
+			return "atencion optimizada de pacientes procesada";
+		} catch (FonasaException e) {
+			return e.getMessage();
+		}
 	}
-	
-    private static final String template = "Hello, %s!";
-    private final AtomicLong counter = new AtomicLong();
 
-    @RequestMapping("/greeting")
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-        return new Greeting(counter.incrementAndGet(),
-                            String.format(template, name));
+    @RequestMapping("/test")
+    public ResponseEntity<List<PacienteMain>> test(@RequestParam(value="name", defaultValue="World") String name) {
+    	ResponseEntity<List<PacienteMain>> resp = null;
+    	
+    	List<PacienteMain> pacientes = fonasaService.prueba();
+		
+		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
+    	
+    	return resp;
     }
 }

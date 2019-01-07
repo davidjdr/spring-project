@@ -4,29 +4,40 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.DiscriminatorFormula;
 
 @Entity
 @Table(name = "view_paciente_edad_prioridad_riesgo")
-public class Paciente {
-	
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(
+    name="tipo",
+    discriminatorType=DiscriminatorType.STRING
+)
+public class PacienteMain {
+
 	private Integer idPaciente;
 	private String nombre;
 	private Date fechaNacimiento;
 	private Integer nroHistoriaClinica;
-	private Integer relacionPesoEstatura;
-	private Integer aniosFumando;
-	private Boolean dieta;
-	private Hospital hospital;
 	private Integer edad;
 	private BigDecimal prioridad;
 	private BigDecimal riesgo;
-	
+	private String tipo;
+	private Hospital hospital;
+	private Date fechaIngreso;
+
 	@Id
 	@Column(name = "id_paciente", unique = true, nullable = false)
 	public Integer getIdPaciente() {
@@ -60,31 +71,7 @@ public class Paciente {
 		this.nroHistoriaClinica = nroHistoriaClinica;
 	}
 	
-	@Column(name = "relacion_peso_estatura")
-	public Integer getRelacionPesoEstatura() {
-		return relacionPesoEstatura;
-	}
-	public void setRelacionPesoEstatura(Integer relacionPesoEstatura) {
-		this.relacionPesoEstatura = relacionPesoEstatura;
-	}
-	
-	@Column(name = "anios_fumando")
-	public Integer getAniosFumando() {
-		return aniosFumando;
-	}
-	public void setAniosFumando(Integer aniosFumando) {
-		this.aniosFumando = aniosFumando;
-	}
-	
-	@Column(name = "dieta")
-	public Boolean isDieta() {
-		return dieta;
-	}
-	public void setDieta(Boolean dieta) {
-		this.dieta = dieta;
-	}
-	
-	@Column(name = "edad")
+	@Column(name = "edad", insertable = false, updatable = false)
 	public Integer getEdad() {
 		return edad;
 	}
@@ -92,7 +79,7 @@ public class Paciente {
 		this.edad = edad;
 	}
 	
-	@Column(name = "prioridad")
+	@Column(name = "prioridad", insertable = false, updatable = false)
 	public BigDecimal getPrioridad() {
 		return prioridad;
 	}
@@ -100,14 +87,22 @@ public class Paciente {
 		this.prioridad = prioridad;
 	}
 	
-	@Column(name = "riesgo")
+	@Column(name = "riesgo", insertable = false, updatable = false)
 	public BigDecimal getRiesgo() {
 		return riesgo;
 	}
 	public void setRiesgo(BigDecimal riesgo) {
 		this.riesgo = riesgo;
 	}
-	
+
+	@Column(name = "tipo", insertable = false, updatable = false)
+	public String getTipo() {
+		return tipo;
+	}
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
+	}
+
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_hospital")
 	public Hospital getHospital() {
@@ -116,4 +111,14 @@ public class Paciente {
 	public void setHospital(Hospital hospital) {
 		this.hospital = hospital;
 	}
+	
+	@Column(name = "fecha_ingreso", insertable = false, updatable = false)
+	public Date getFechaIngreso() {
+		return fechaIngreso;
+	}
+	public void setFechaIngreso(Date fechaIngreso) {
+		this.fechaIngreso = fechaIngreso;
+	}
+	
+	
 }

@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `consulta`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `consulta` (
   `id_consulta` int(11) NOT NULL AUTO_INCREMENT,
-  `cant_pacientes` int(11) NOT NULL,
+  `cant_pacientes` int(11) NOT NULL DEFAULT '0',
   `nombre_especialista` varchar(300) DEFAULT NULL,
   `id_estado_consulta` int(11) NOT NULL,
   `id_tipo_consulta` int(11) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE `consulta` (
 
 LOCK TABLES `consulta` WRITE;
 /*!40000 ALTER TABLE `consulta` DISABLE KEYS */;
-INSERT INTO `consulta` VALUES (1,0,'tempor incididunt u',2,2,1,NULL),(2,0,'ur. Exce',2,3,2,NULL),(3,0,'in cul',2,1,2,NULL),(4,0,' in volup',2,1,1,NULL),(5,0,'aecat cupidat',2,2,2,NULL),(6,0,'quat.',2,1,2,NULL),(7,0,'Excepteur sint ',2,2,1,NULL),(8,0,'a',2,2,2,NULL),(9,0,'et, consec',2,1,1,NULL),(10,0,'t ',2,1,1,NULL);
+INSERT INTO `consulta` VALUES (1,0,'tempor incididunt u',2,2,1,NULL),(2,0,'ur. Exce',2,3,2,NULL),(3,1,'in cul',2,1,2,10),(4,0,' in volup',2,1,1,NULL),(5,5,'aecat cupidat',2,2,2,NULL),(6,0,'quat.',2,1,2,NULL),(7,3,'Excepteur sint ',2,2,1,NULL),(8,0,'a',2,2,2,NULL),(9,0,'et, consec',2,1,1,NULL),(10,0,'t ',2,1,1,NULL);
 /*!40000 ALTER TABLE `consulta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -111,11 +111,12 @@ CREATE TABLE `paciente` (
   `id_paciente` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(300) NOT NULL,
   `fecha_nacimiento` date NOT NULL,
-  `nro_historia_clinica` int(11) DEFAULT NULL,
+  `nro_historia_clinica` int(11) NOT NULL,
   `relacion_peso_estatura` int(11) DEFAULT NULL,
   `anios_fumando` int(11) DEFAULT NULL,
   `id_hospital` int(11) NOT NULL,
   `dieta` tinyint(1) DEFAULT '0',
+  `fecha_ingreso` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_paciente`),
   UNIQUE KEY `paciente_UN` (`nro_historia_clinica`),
   KEY `paciente_hospital_FK` (`id_hospital`),
@@ -129,7 +130,7 @@ CREATE TABLE `paciente` (
 
 LOCK TABLES `paciente` WRITE;
 /*!40000 ALTER TABLE `paciente` DISABLE KEYS */;
-INSERT INTO `paciente` VALUES (1,'aboris ni','2001-01-30',1,NULL,0,2,0),(2,'llamco ','1998-06-02',2,NULL,0,2,0),(3,'qui of','1951-10-17',3,NULL,NULL,1,0),(4,'g el','1999-11-26',4,NULL,0,1,0),(5,'at. Duis aute irur','2015-08-14',5,2,NULL,1,0),(6,'et, consectetur adip','2003-05-12',6,4,NULL,1,0),(7,'ore et dolore ma','1986-10-20',7,NULL,5,2,0),(8,'ru','2015-01-31',8,2,NULL,2,0),(9,'ed do e','1984-11-07',9,NULL,7,1,0),(10,' ex ea commodo co','1952-05-02',10,NULL,NULL,2,1);
+INSERT INTO `paciente` VALUES (1,'aboris ni','2001-01-30',1,NULL,0,2,0,'2019-01-05 21:46:45'),(2,'llamco ','1998-06-02',2,NULL,0,2,0,'2019-01-05 21:46:45'),(3,'qui of','1951-10-17',3,NULL,NULL,1,0,'2019-01-06 21:46:45'),(4,'g el','1999-11-26',4,NULL,0,1,0,'2019-01-06 21:46:45'),(5,'at. Duis aute irur','2015-08-14',5,2,NULL,1,0,'2019-01-04 21:46:45'),(6,'et, consectetur adip','2003-05-12',6,4,NULL,1,0,'2019-01-06 21:46:45'),(7,'ore et dolore ma','1986-10-20',7,NULL,5,2,0,'2019-01-04 21:46:45'),(8,'ru','2015-01-31',8,2,NULL,2,0,'2019-01-06 21:46:45'),(9,'ed do e','1984-11-07',9,NULL,7,1,0,'2019-01-06 21:46:45'),(10,' ex ea commodo co','1952-05-02',10,NULL,NULL,2,1,'2019-01-06 21:46:45');
 /*!40000 ALTER TABLE `paciente` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -142,12 +143,9 @@ DROP TABLE IF EXISTS `sala_de_espera`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sala_de_espera` (
   `id_paciente` int(11) NOT NULL,
-  `id_consulta` int(11) NOT NULL,
-  `llegada` date NOT NULL,
+  `llegada` datetime NOT NULL,
   `pendiente` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id_paciente`,`id_consulta`),
-  KEY `sala_de_espera_consulta_FK` (`id_consulta`),
-  CONSTRAINT `sala_de_espera_consulta_FK` FOREIGN KEY (`id_consulta`) REFERENCES `consulta` (`id_consulta`),
+  PRIMARY KEY (`id_paciente`),
   CONSTRAINT `sala_de_espera_paciente_FK` FOREIGN KEY (`id_paciente`) REFERENCES `paciente` (`id_paciente`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -158,6 +156,7 @@ CREATE TABLE `sala_de_espera` (
 
 LOCK TABLES `sala_de_espera` WRITE;
 /*!40000 ALTER TABLE `sala_de_espera` DISABLE KEYS */;
+INSERT INTO `sala_de_espera` VALUES (1,'2018-01-07 02:00:00',0),(2,'2018-01-07 01:00:00',0),(4,'2018-01-07 00:00:00',0);
 /*!40000 ALTER TABLE `sala_de_espera` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -202,7 +201,8 @@ SET character_set_client = utf8;
  1 AS `anios_fumando`,
  1 AS `dieta`,
  1 AS `id_hospital`,
- 1 AS `edad`*/;
+ 1 AS `edad`,
+ 1 AS `fecha_ingreso`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -223,7 +223,9 @@ SET character_set_client = utf8;
  1 AS `dieta`,
  1 AS `id_hospital`,
  1 AS `edad`,
- 1 AS `prioridad`*/;
+ 1 AS `fecha_ingreso`,
+ 1 AS `prioridad`,
+ 1 AS `tipo`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -243,9 +245,11 @@ SET character_set_client = utf8;
  1 AS `anios_fumando`,
  1 AS `dieta`,
  1 AS `id_hospital`,
+ 1 AS `fecha_ingreso`,
  1 AS `edad`,
  1 AS `prioridad`,
- 1 AS `riesgo`*/;
+ 1 AS `riesgo`,
+ 1 AS `tipo`*/;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -265,7 +269,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `view_paciente_edad` AS select `paciente`.`id_paciente` AS `id_paciente`,`paciente`.`nombre` AS `nombre`,`paciente`.`fecha_nacimiento` AS `fecha_nacimiento`,`paciente`.`nro_historia_clinica` AS `nro_historia_clinica`,`paciente`.`relacion_peso_estatura` AS `relacion_peso_estatura`,`paciente`.`anios_fumando` AS `anios_fumando`,`paciente`.`dieta` AS `dieta`,`paciente`.`id_hospital` AS `id_hospital`,((year(curdate()) - year(`paciente`.`fecha_nacimiento`)) + if((date_format(curdate(),'%m-%d') > date_format(`paciente`.`fecha_nacimiento`,'%m-%d')),0,-(1))) AS `edad` from `paciente` */;
+/*!50001 VIEW `view_paciente_edad` AS select `paciente`.`id_paciente` AS `id_paciente`,`paciente`.`nombre` AS `nombre`,`paciente`.`fecha_nacimiento` AS `fecha_nacimiento`,`paciente`.`nro_historia_clinica` AS `nro_historia_clinica`,`paciente`.`relacion_peso_estatura` AS `relacion_peso_estatura`,`paciente`.`anios_fumando` AS `anios_fumando`,`paciente`.`dieta` AS `dieta`,`paciente`.`id_hospital` AS `id_hospital`,((year(curdate()) - year(`paciente`.`fecha_nacimiento`)) + if((date_format(curdate(),'%m-%d') > date_format(`paciente`.`fecha_nacimiento`,'%m-%d')),0,-(1))) AS `edad`,`paciente`.`fecha_ingreso` AS `fecha_ingreso` from `paciente` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -283,7 +287,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `view_paciente_edad_prioridad` AS select `view_paciente_edad`.`id_paciente` AS `id_paciente`,`view_paciente_edad`.`nombre` AS `nombre`,`view_paciente_edad`.`fecha_nacimiento` AS `fecha_nacimiento`,`view_paciente_edad`.`nro_historia_clinica` AS `nro_historia_clinica`,`view_paciente_edad`.`relacion_peso_estatura` AS `relacion_peso_estatura`,`view_paciente_edad`.`anios_fumando` AS `anios_fumando`,`view_paciente_edad`.`dieta` AS `dieta`,`view_paciente_edad`.`id_hospital` AS `id_hospital`,`view_paciente_edad`.`edad` AS `edad`,(case when (`view_paciente_edad`.`edad` < 6) then (`view_paciente_edad`.`relacion_peso_estatura` + 3) when ((`view_paciente_edad`.`edad` > 5) and (`view_paciente_edad`.`edad` < 13)) then (`view_paciente_edad`.`relacion_peso_estatura` + 2) when ((`view_paciente_edad`.`edad` > 12) and (`view_paciente_edad`.`edad` < 16)) then (`view_paciente_edad`.`relacion_peso_estatura` + 1) when ((`view_paciente_edad`.`edad` > 15) and (`view_paciente_edad`.`edad` < 41)) then if((`view_paciente_edad`.`anios_fumando` is not null),((`view_paciente_edad`.`anios_fumando` / 4) + 2),2) when ((`view_paciente_edad`.`edad` > 59) and (`view_paciente_edad`.`edad` < 101)) then if((`view_paciente_edad`.`dieta` is true),((`view_paciente_edad`.`edad` / 20) + 4),((`view_paciente_edad`.`edad` / 30) + 3)) end) AS `prioridad` from `view_paciente_edad` */;
+/*!50001 VIEW `view_paciente_edad_prioridad` AS select `view_paciente_edad`.`id_paciente` AS `id_paciente`,`view_paciente_edad`.`nombre` AS `nombre`,`view_paciente_edad`.`fecha_nacimiento` AS `fecha_nacimiento`,`view_paciente_edad`.`nro_historia_clinica` AS `nro_historia_clinica`,`view_paciente_edad`.`relacion_peso_estatura` AS `relacion_peso_estatura`,`view_paciente_edad`.`anios_fumando` AS `anios_fumando`,`view_paciente_edad`.`dieta` AS `dieta`,`view_paciente_edad`.`id_hospital` AS `id_hospital`,`view_paciente_edad`.`edad` AS `edad`,`view_paciente_edad`.`fecha_ingreso` AS `fecha_ingreso`,(case when (`view_paciente_edad`.`edad` < 6) then (`view_paciente_edad`.`relacion_peso_estatura` + 3) when ((`view_paciente_edad`.`edad` > 5) and (`view_paciente_edad`.`edad` < 13)) then (`view_paciente_edad`.`relacion_peso_estatura` + 2) when ((`view_paciente_edad`.`edad` > 12) and (`view_paciente_edad`.`edad` < 16)) then (`view_paciente_edad`.`relacion_peso_estatura` + 1) when ((`view_paciente_edad`.`edad` > 15) and (`view_paciente_edad`.`edad` < 41)) then if((`view_paciente_edad`.`anios_fumando` is not null),((`view_paciente_edad`.`anios_fumando` / 4) + 2),2) when ((`view_paciente_edad`.`edad` > 59) and (`view_paciente_edad`.`edad` < 101)) then if((`view_paciente_edad`.`dieta` is true),((`view_paciente_edad`.`edad` / 20) + 4),((`view_paciente_edad`.`edad` / 30) + 3)) end) AS `prioridad`,(case when (`view_paciente_edad`.`edad` < 16) then 'N' when ((`view_paciente_edad`.`edad` > 15) and (`view_paciente_edad`.`edad` < 41)) then 'J' when (`view_paciente_edad`.`edad` > 41) then 'A' end) AS `tipo` from `view_paciente_edad` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -301,7 +305,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `view_paciente_edad_prioridad_riesgo` AS select `view_paciente_edad_prioridad`.`id_paciente` AS `id_paciente`,`view_paciente_edad_prioridad`.`nombre` AS `nombre`,`view_paciente_edad_prioridad`.`fecha_nacimiento` AS `fecha_nacimiento`,`view_paciente_edad_prioridad`.`nro_historia_clinica` AS `nro_historia_clinica`,`view_paciente_edad_prioridad`.`relacion_peso_estatura` AS `relacion_peso_estatura`,`view_paciente_edad_prioridad`.`anios_fumando` AS `anios_fumando`,`view_paciente_edad_prioridad`.`dieta` AS `dieta`,`view_paciente_edad_prioridad`.`id_hospital` AS `id_hospital`,`view_paciente_edad_prioridad`.`edad` AS `edad`,`view_paciente_edad_prioridad`.`prioridad` AS `prioridad`,(case when (`view_paciente_edad_prioridad`.`edad` < 41) then ((`view_paciente_edad_prioridad`.`edad` * `view_paciente_edad_prioridad`.`prioridad`) / 100) when (`view_paciente_edad_prioridad`.`edad` > 40) then (((`view_paciente_edad_prioridad`.`edad` * `view_paciente_edad_prioridad`.`prioridad`) / 100) + 5.3) end) AS `riesgo` from `view_paciente_edad_prioridad` */;
+/*!50001 VIEW `view_paciente_edad_prioridad_riesgo` AS select `view_paciente_edad_prioridad`.`id_paciente` AS `id_paciente`,`view_paciente_edad_prioridad`.`nombre` AS `nombre`,`view_paciente_edad_prioridad`.`fecha_nacimiento` AS `fecha_nacimiento`,`view_paciente_edad_prioridad`.`nro_historia_clinica` AS `nro_historia_clinica`,`view_paciente_edad_prioridad`.`relacion_peso_estatura` AS `relacion_peso_estatura`,`view_paciente_edad_prioridad`.`anios_fumando` AS `anios_fumando`,`view_paciente_edad_prioridad`.`dieta` AS `dieta`,`view_paciente_edad_prioridad`.`id_hospital` AS `id_hospital`,`view_paciente_edad_prioridad`.`fecha_ingreso` AS `fecha_ingreso`,`view_paciente_edad_prioridad`.`edad` AS `edad`,`view_paciente_edad_prioridad`.`prioridad` AS `prioridad`,(case when (`view_paciente_edad_prioridad`.`edad` < 41) then ((`view_paciente_edad_prioridad`.`edad` * `view_paciente_edad_prioridad`.`prioridad`) / 100) when (`view_paciente_edad_prioridad`.`edad` > 40) then (((`view_paciente_edad_prioridad`.`edad` * `view_paciente_edad_prioridad`.`prioridad`) / 100) + 5.3) end) AS `riesgo`,`view_paciente_edad_prioridad`.`tipo` AS `tipo` from `view_paciente_edad_prioridad` */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -315,4 +319,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-01-05 21:08:23
+-- Dump completed on 2019-01-06 22:32:39

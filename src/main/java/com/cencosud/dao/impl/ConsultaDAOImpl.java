@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.cencosud.dao.ConsultaDAO;
-import com.cencosud.dao.PacienteDAO;
 import com.cencosud.entity.Consulta;
-import com.cencosud.entity.Paciente;
 
 @Repository
 public class ConsultaDAOImpl extends GenericDAOImpl <Consulta, Long> implements ConsultaDAO {
@@ -33,4 +31,32 @@ public class ConsultaDAOImpl extends GenericDAOImpl <Consulta, Long> implements 
 		return consultas;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Boolean liberarConsultas() {
+		
+		String hql = "update Consulta c set c.idPaciente=null, c.cantPacientes = c.cantPacientes + 1"
+				+ " where c.idPaciente is not null";
+		
+		Query<Consulta> q  = this.sessionFactory.getCurrentSession().createQuery(hql);
+		
+		int res = q.executeUpdate();
+		
+		return (res > 0)? true : false;
+	}
+
+	@Override
+	public List<Consulta> obtenerConsultasDesocupadas() {
+		List<Consulta> consultas = null;
+		
+		String hql = "select c from Consulta c "
+			      +" where c.idPaciente is null";
+		
+		Query<Consulta> q  = this.sessionFactory.getCurrentSession().createQuery(hql);
+		
+		consultas = q.getResultList();
+		
+		return consultas;
+	}
+	
 }
