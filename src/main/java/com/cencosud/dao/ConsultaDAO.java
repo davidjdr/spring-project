@@ -11,7 +11,7 @@ public interface ConsultaDAO extends GenericDAO<Consulta, Long>{
 	
 	public List<Consulta> getConsultaPacientesAtendidos();
 	
-	public Boolean liberarConsultas();
+	public void liberarConsultas();
 
 	public List<Consulta> obtenerConsultasDesocupadas();
 }

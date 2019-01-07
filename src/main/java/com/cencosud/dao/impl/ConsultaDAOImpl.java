@@ -33,7 +33,7 @@ public class ConsultaDAOImpl extends GenericDAOImpl <Consulta, Long> implements 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Boolean liberarConsultas() {
+	public void liberarConsultas() {
 		
 		String hql = "update Consulta c set c.idPaciente=null, c.cantPacientes = c.cantPacientes + 1"
 				+ " where c.idPaciente is not null";
@@ -41,8 +41,6 @@ public class ConsultaDAOImpl extends GenericDAOImpl <Consulta, Long> implements 
 		Query<Consulta> q  = this.sessionFactory.getCurrentSession().createQuery(hql);
 		
 		int res = q.executeUpdate();
-		
-		return (res > 0)? true : false;
 	}
 
 	@Override

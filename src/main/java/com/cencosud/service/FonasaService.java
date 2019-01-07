@@ -62,19 +62,9 @@ public class FonasaService {
 	}
 
 	@Transactional
-	public Boolean liberarConsultas() {
-		
-		Boolean liberadas = consultaDAO.liberarConsultas();
-		
-		if (liberadas) {
-			try {
-				atenderPacientes();
-			} catch (FonasaException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return liberadas;
+	public void liberarConsultas() {
+
+		consultaDAO.liberarConsultas();
 	}
 
 	@Transactional
@@ -96,6 +86,11 @@ public class FonasaService {
 	 */
 	@Transactional
 	public void atenderPacientes() throws FonasaException {
+		atiendoPacientesSalaDeEspera();
+		atiendoPacientesRestantes();
+	}
+
+	private void atiendoPacientesSalaDeEspera() {
 		List<PacienteMain>  pacientes = pacienteMainDAO.obtenerPacientesEnSalaDeEspera();
 		List<Consulta> consultas = consultaDAO.obtenerConsultasDesocupadas();
 		
@@ -122,22 +117,25 @@ public class FonasaService {
 				}
 			}
 		}
-		
-		/**
-		 		Segundo atiendo a los pacientes pendientes, pero...
-		 		los pendientes son todos los registros de la entidad Paciente?
-		 		En el punto 3 del flujo se menciona: 
-		 			Si luego de atendidos los de la sala de espera no quedara ninguna consulta libre, entonces
-		 			el paciente de la sala de pendiente que le corresponde ser atendido según su prioridad, pasa a la sala
-		 			de espera, sino será atendido por la consulta adecuada.
-		 		Menciona una sala de pendiente unicamente en este punto del ejercicio, pero no menciona como llenar dicha sala
-		 		o si con eso se refiere a todos los pacientes ingresados en el sistema, lo cual a nivel de un hospital real
-		 		no resulta muy logico... (el paciente existe solo si lo estan atendiendo?)
-		 		
-		 		para poder avanzar con el ejercicio asumire que son todos los pacientes del sistema, que no esten ya en consulta
-		 */
-		pacientes = pacienteMainDAO.obtenerPacientesParaAtender();
-		
+	}
+	
+	/**
+			Segundo atiendo a los pacientes pendientes, pero...
+			los pendientes son todos los registros de la entidad Paciente?
+			En el punto 3 del flujo se menciona: 
+				Si luego de atendidos los de la sala de espera no quedara ninguna consulta libre, entonces
+				el paciente de la sala de pendiente que le corresponde ser atendido según su prioridad, pasa a la sala
+				de espera, sino será atendido por la consulta adecuada.
+			Menciona una sala de pendiente unicamente en este punto del ejercicio, pero no menciona como llenar dicha sala
+			o si con eso se refiere a todos los pacientes ingresados en el sistema, lo cual a nivel de un hospital real
+			no resulta muy logico... (el paciente existe solo si lo estan atendiendo?)
+			
+			para poder avanzar con el ejercicio asumire que son todos los pacientes del sistema, que no esten ya en consulta
+	*/
+	private void atiendoPacientesRestantes() {
+		List<PacienteMain>  pacientes = pacienteMainDAO.obtenerPacientesParaAtender();
+		List<Consulta> consultas = consultaDAO.obtenerConsultasDesocupadas();
+
 		for (PacienteMain paciente : pacientes) {
 			BigDecimal prioridadReq = new BigDecimal(4.1);
 			
@@ -194,7 +192,37 @@ public class FonasaService {
 	 * Esta funcionalidad la veo como una combinacion de atender pacientes (pero organizada segun gravedad y tipo (niños y ancianos primero)
 	 * igual con sala de espera pero segun prioridad y urgencia (riesgo supongo, pero el ejercicio dice urgencia)
 	 */
+	@Transactional
 	public void optimizarAtencion() throws FonasaException {
+		atiendoPacientesSalaDeEsperaPriorizados();
+		atiendoPacientesRestantesPriorizados();
+		//Finalmente libera todas las consultas, segun enunciado
+		liberarConsultas();
+	}
+
+	private void atiendoPacientesRestantesPriorizados() {
+		List<PacienteMain> pacientes = pacienteMainDAO.obtenerPacientesParaAtenderPriorizados();
+		List<Consulta> consultas = consultaDAO.obtenerConsultasDesocupadas();
+
+		for (PacienteMain paciente : pacientes) {
+			BigDecimal prioridadReq = new BigDecimal(4.1);
+			
+			//-1 menor, 0 igual , or 1 mayor
+			if (paciente.getPrioridad().compareTo(prioridadReq) < 1) {
+				if (paciente.getTipo() == Variables.PACIENTE_NINO) {
+					// paciente es niño con prioridad menor o igual a 4
+					agregarPacienteAConsulta(paciente, consultas, Variables.PEDIADRIA);
+				} else {
+					agregarPacienteAConsulta(paciente, consultas, Variables.CGI);
+				}			
+			} else {
+				// para urgencias!
+				agregarPacienteAConsulta(paciente, consultas, Variables.URGENCIA);
+			}
+		}
+	}
+
+	private void atiendoPacientesSalaDeEsperaPriorizados() {
 		List<PacienteMain>  pacientes = pacienteMainDAO.obtenerPacientesEnSalaDeEsperaPriorizados();
 		List<Consulta> consultas = consultaDAO.obtenerConsultasDesocupadas();
 		
@@ -215,27 +243,5 @@ public class FonasaService {
 				agregarPacienteAConsulta(paciente, consultas, Variables.URGENCIA);
 			}
 		}
-
-		pacientes = pacienteMainDAO.obtenerPacientesParaAtenderPriorizados();
-		
-		for (PacienteMain paciente : pacientes) {
-			BigDecimal prioridadReq = new BigDecimal(4.1);
-			
-			//-1 menor, 0 igual , or 1 mayor
-			if (paciente.getPrioridad().compareTo(prioridadReq) < 1) {
-				if (paciente.getTipo() == Variables.PACIENTE_NINO) {
-					// paciente es niño con prioridad menor o igual a 4
-					agregarPacienteAConsulta(paciente, consultas, Variables.PEDIADRIA);
-				} else {
-					agregarPacienteAConsulta(paciente, consultas, Variables.CGI);
-				}			
-			} else {
-				// para urgencias!
-				agregarPacienteAConsulta(paciente, consultas, Variables.URGENCIA);
-			}
-		}
-		
-		//Finalmente libera todas las consultas, segun enunciado
-		liberarConsultas();
 	}
 }

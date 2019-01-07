@@ -52,9 +52,15 @@ public class MainController {
 	@RequestMapping(value = "/liberarConsultas", method = RequestMethod.GET)
 	public String liberarConsultas() {
 		
-		Boolean respuesta = fonasaService.liberarConsultas();
+		fonasaService.liberarConsultas();
 		
-		return (respuesta)? "consultas liberadas" : "error al liberar las consultas";
+		try {
+			fonasaService.atenderPacientes();
+		} catch (FonasaException e) {
+			e.printStackTrace();
+		}
+		
+		return "consultas liberadas";
 	}
 	
 	/**
@@ -110,15 +116,4 @@ public class MainController {
 			return e.getMessage();
 		}
 	}
-
-    @RequestMapping("/test")
-    public ResponseEntity<List<PacienteMain>> test(@RequestParam(value="name", defaultValue="World") String name) {
-    	ResponseEntity<List<PacienteMain>> resp = null;
-    	
-    	List<PacienteMain> pacientes = fonasaService.prueba();
-		
-		resp = new ResponseEntity<>(pacientes, HttpStatus.OK);
-    	
-    	return resp;
-    }
 }
